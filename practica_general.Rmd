@@ -59,7 +59,7 @@ Las estadísticas descriptivas del tamaño de los pingüinos son:
 ## Gráficos
 
 ```{r plot_barras}
-data %>% ggplot(aes(x=island,fill=species)) + geom_bar() +theme_bw()  +labs(y="Conteo", x="Isla", fill="Especie", title="Número de individuos muestreados en cada isla")
+data %>% ggplot(aes(x=island,fill=species)) + geom_bar() +theme_bw()  +labs(y="Conteo", x="Isla", fill="Especie", title="Número de individuos muestreados en cada isla") + scale_fill_manual(values=c("orange","purple","blue"))
 
 knitr::kable(addmargins(table(data$species,data$island)),format="markdown")
 ```
@@ -67,7 +67,7 @@ knitr::kable(addmargins(table(data$species,data$island)),format="markdown")
 La única especie que se muestreó en las tres islas es *Adelie*. El número total de individuos en la isla Dream fue de 124.
 
 ```{r plot_multipanel}
-data %>%ggplot(aes(y=body_mass_g,x=sex,fill=species)) + geom_boxplot() + facet_wrap(vars(species)) +theme_bw() + labs(y="Tamaño (g)", x="Sexo") +theme(legend.position = "off")
+data %>%ggplot(aes(y=body_mass_g,x=sex,fill=species)) + geom_boxplot() + facet_wrap(vars(species)) +theme_bw() + labs(y="Tamaño (g)", x="Sexo") +theme(legend.position = "off") + scale_fill_manual(values=c("orange","purple","blue"))
 ```
 
 La especie de mayor tamaño fue *Gentoo*. La especie en la que machos y hembras tuvieron un tamaño más similar fue *Chinstrap*.

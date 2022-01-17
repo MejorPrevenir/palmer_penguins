@@ -1,0 +1,73 @@
+---
+title: "Práctica General"
+author: "Caros Fernández Escobar"
+date: "17/1/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+```
+
+## Cargar los datos
+
+Cargamos las bibliotecas y los datos de los pingüinos.
+
+```{r cargar, message=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+data <- penguins
+```
+
+## Tablas
+
+```{r descriptiva}
+# Cuento el número de especies y por sexos
+data %>% count(species)
+tabla_sexos <- table(data$species,data$sex)
+knitr::kable(tabla_sexos,format="markdown")
+
+# Hago un bucle para crear tablas descriptivas para cada variable y luego combinarlas
+
+variables <- c("bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g")
+list_summary_tables <- list()
+for (i in 1:length(variables)) {
+list_summary_tables[[i]] <- data %>% 
+  summarise(variable=variables[i],
+            mean=mean(get(variables[i]),na.rm=T),
+            sd=sd(get(variables[i]),na.rm=T),
+            min=min(get(variables[i]),na.rm=T),
+            max=max(get(variables[i]),na.rm=T))
+}
+summary_table <- bind_rows(list_summary_tables)
+knitr::kable(summary_table,format="markdown")
+
+```
+
+El número de individuos totales es `r count(data)`, de los cuales `r count(data[data$species=="Adelie",])` son de la especie *Adelie* (`r count(data[data$species=="Adelie" & data$sex=="female" & !is.na(data$sex),])` hembras y `r count(data[data$species=="Adelie" & data$sex=="male" & !is.na(data$sex),])` machos), `r count(data[data$species=="Chinstrap",])` son de la especie *Chinstrap* (`r count(data[data$species=="Chinstrap" & data$sex=="female" & !is.na(data$sex),])` hembras y `r count(data[data$species=="Chinstrap" & data$sex=="male" & !is.na(data$sex),])` machos) y `r count(data[data$species=="Gentoo",])` son de la especie *Gentoo* (`r count(data[data$species=="Gentoo" & data$sex=="female" & !is.na(data$sex),])` hembras y `r count(data[data$species=="Gentoo" & data$sex=="male" & !is.na(data$sex),])` machos).
+
+Las estadísticas descriptivas del tamaño de los pingüinos son:
+
+-   **Longitud del pico (mm)**: media=`r round(summary_table[1,2],2)`, desviación estándar=`r round(summary_table[1,3],2)`, mínimo=`r round(summary_table[1,4],2)`, máximo=`r round(summary_table[1,5],2)`
+
+-   **Profundidad del pico (mm)**: media=`r round(summary_table[2,2],2)`, desviación estándar=`r round(summary_table[2,3],2)`, mínimo=`r round(summary_table[2,4],2)`, máximo=`r round(summary_table[2,5],2)`
+
+-   **Longitud de la aleta (mm)**: media=`r round(summary_table[3,2],2)`, desviación estándar=`r round(summary_table[3,3],2)`, mínimo=`r round(summary_table[3,4],2)`, máximo=`r round(summary_table[3,5],2)`
+
+-   **Tamaño (g)**: media=`r round(summary_table[4,2],2)`, desviación estándar=`r round(summary_table[4,3],2)`, mínimo=`r round(summary_table[4,4],2)`, máximo=`r round(summary_table[4,5],2)`
+
+## Gráficos
+
+```{r plot_barras}
+data %>% ggplot(aes(x=island,fill=species)) + geom_bar() +theme_bw()  +labs(y="Conteo", x="Isla", fill="Especie", title="Número de individuos muestreados en cada isla")
+
+knitr::kable(addmargins(table(data$species,data$island)),format="markdown")
+```
+
+La única especie que se muestreó en las tres islas es *Adelie*. El número total de individuos en la isla Dream fue de 124.
+
+```{r plot_multipanel}
+data %>%ggplot(aes(y=body_mass_g,x=sex,fill=species)) + geom_boxplot() + facet_wrap(vars(species)) +theme_bw() + labs(y="Tamaño (g)", x="Sexo") +theme(legend.position = "off")
+```
+
+La especie de mayor tamaño fue *Gentoo*. La especie en la que machos y hembras tuvieron un tamaño más similar fue *Chinstrap*.
